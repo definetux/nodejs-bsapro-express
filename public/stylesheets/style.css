@@ -18,3 +18,27 @@ a {
 .user-container input, .user-container button{
 	margin-left: 10px;
 }
+
+#task-list {
+	margin-top: 20px;
+}
+
+.task-container .readonly, .task-container .editable {
+	display: inline-block;
+}
+
+.task-container .actions {
+	display: inline-block;
+}
+
+.hidden {
+	display: none !important;
+}
+
+.task-container .grid-row .grid-cell {
+	margin: 0 20px;
+}
+
+.task-container .grid-row {
+	margin-bottom: 10px;
+}

@@ -1,0 +1,12 @@
+extends layout
+
+block content
+	h1 Here are the tasks
+	.task-container
+		#new-task
+			input.task-name(type="text" placeholder="Name")
+			input.task-description(type="text" placeholder="Description")
+			button.save-task(type="button") Save
+		#task-list
+
+	script(src="/javascripts/tasks.js")
