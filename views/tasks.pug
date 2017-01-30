@@ -6,7 +6,9 @@ block content
 		#new-task
 			input.task-name(type="text" placeholder="Name")
 			input.task-description(type="text" placeholder="Description")
-			button.save-task(type="button") Save
+			button.add-task(type="button") Save
 		#task-list
 
+	script(src="/javascripts/taskService.js")
+	script(src="/javascripts/DOMManipulator.js")
 	script(src="/javascripts/tasks.js")
