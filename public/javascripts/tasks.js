@@ -48,8 +48,14 @@ class TaskManager {
 	}
 
 	_init() {
+		this.showAll = false;
 		this._bindListeners();
 		this._loadTasks();
+		this.socket = io('http://localhost:2222');
+		this.socket.on('task_updated', (data) => {
+			this._clearTasks(this.$$taskList);
+			this._loadTasks(this.showAll);
+		});
 	}
 
 	_loadTasks(all = true) {
@@ -113,6 +119,7 @@ class TaskManager {
 			obj.$$taskList.appendChild(obj._renderTask(task));
 			$taskName.value = '';
 			$taskDescription.value = '';
+			obj.socket.emit('task_updated');
 		});
 	}
 
@@ -146,6 +153,8 @@ class TaskManager {
 			name: taskName,
 			description: taskDescription,
 			isDone: isDone
+		}).then(() => {
+			obj.socket.emit('task_updated');
 		});
 	}
 
@@ -154,6 +163,7 @@ class TaskManager {
 		var taskIdReadonly = $row.querySelector('.task-id');
 		obj.taskService.deleteTask(taskIdReadonly.innerText).then(function() {
 			obj.$$taskList.removeChild($row);
+			obj.socket.emit('task_updated');
 		});
 	}
 
@@ -162,17 +172,20 @@ class TaskManager {
 		var taskIdReadonly = $row.querySelector('.task-id');
 		var state = $row.querySelector('.task-is-done').checked;
 		obj.taskService.changeState(taskIdReadonly.innerText, state).then(function() {
+			obj.socket.emit('task_updated');
 		});
 	}
 
 	_onShowAllClick(obj, event) {
+		obj.showAll = true;
 		obj._clearTasks(obj.$$taskList);
-		obj._loadTasks();
+		obj._loadTasks(obj.showAll);
 	}
 
 	_onShowTodoClick(obj, event) {
+		obj.showAll = false;
 		obj._clearTasks(obj.$$taskList);
-		obj._loadTasks(false);
+		obj._loadTasks(obj.showAll);
 	}
 
 	_clearTasks(container) {
