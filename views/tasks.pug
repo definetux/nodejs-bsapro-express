@@ -3,6 +3,9 @@ extends layout
 block content
 	h1 Here are the tasks
 	.task-container
+		.show-history
+			button.show-all(type="button") All
+			button.show-todo(type="button") TODO
 		#new-task
 			input.task-name(type="text" placeholder="Name")
 			input.task-description(type="text" placeholder="Description")

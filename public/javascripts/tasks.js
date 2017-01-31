@@ -9,9 +9,38 @@ class TaskManager {
 	}
 
 	_bindListeners() {
+		this.commands.push({
+			commandName: 'task-is-done',
+			callback: this._onTaskStateChange
+		});
+		this.commands.push({
+			commandName: 'add-task',
+			callback: this._onAddClick
+		});
+		this.commands.push({
+			commandName: 'edit-task',
+			callback: this._onEditClick
+		});
+		this.commands.push({
+			commandName: 'save-task',
+			callback: this._onSaveClick
+		});
+		this.commands.push({
+			commandName: 'delete-task',
+			callback: this._onDeleteClick
+		});
+		this.commands.push({
+			commandName: 'show-todo',
+			callback: this._onShowTodoClick
+		});
+		this.commands.push({
+			commandName: 'show-all',
+			callback: this._onShowAllClick
+		});
+
 		document.addEventListener('click', (event) => {
 			this.commands.forEach((c) => {
-				if (c.commandName === event.target.className) {
+				if (event.target.className.indexOf(c.commandName) !== -1) {
 					c.callback(this, event);
 				}
 			});
@@ -19,20 +48,18 @@ class TaskManager {
 	}
 
 	_init() {
-		this.commands.push({
-			commandName: 'add-task',
-			callback: this._onAddClick
-		});
-
 		this._bindListeners();
 		this._loadTasks();
 	}
 
-	_loadTasks() {
-		this.taskService.loadTasks().then((tasks) => this._renderTasks(tasks));
+	_loadTasks(all = true) {
+		this.taskService.loadTasks().then((tasks) => this._renderTasks(tasks, all));
 	}
 
-	_renderTasks(tasks) {
+	_renderTasks(tasks, all) {
+		if (!all) {
+			tasks = tasks.filter((task) => !task.isDone);
+		}
 		tasks.forEach((task) => this.$$taskList.appendChild(this._renderTask(task)));
 	}
 
@@ -40,6 +67,8 @@ class TaskManager {
 		var $taskContainer = this.domManipulator.createBlock('grid-row');
 
 		var $isDone = this.domManipulator.createCheckbox(task.isDone, 'grid-cell task-is-done');
+
+
 		$taskContainer.appendChild($isDone);
 		$taskContainer.appendChild(this._createEditableRow(task));		
 		$taskContainer.appendChild(this._createRow(task));
@@ -67,22 +96,9 @@ class TaskManager {
 		var $actionsContainer = this.domManipulator.createBlock('actions');
 
 		$actionsContainer.appendChild(this.domManipulator.createButton('Edit', 'edit-task'));
-		this.commands.push({
-			commandName: 'edit-task',
-			callback: this._onEditClick
-		});
-
 		$actionsContainer.appendChild(this.domManipulator.createButton('Save', 'save-task hidden'));
-		this.commands.push({
-			commandName: 'save-task',
-			callback: this._onSaveClick
-		});
-
 		$actionsContainer.appendChild(this.domManipulator.createButton('Delete', 'delete-task'));
-		this.commands.push({
-			commandName: 'delete-task',
-			callback: this._onDeleteClick
-		});
+		
 		return $actionsContainer;
 	}
 
@@ -139,6 +155,30 @@ class TaskManager {
 		obj.taskService.deleteTask(taskIdReadonly.innerText).then(function() {
 			obj.$$taskList.removeChild($row);
 		});
+	}
+
+	_onTaskStateChange(obj, event) {
+		var $row = obj.domManipulator.getClosest(event.target, '.grid-row');
+		var taskIdReadonly = $row.querySelector('.task-id');
+		var state = $row.querySelector('.task-is-done').checked;
+		obj.taskService.changeState(taskIdReadonly.innerText, state).then(function() {
+		});
+	}
+
+	_onShowAllClick(obj, event) {
+		obj._clearTasks(obj.$$taskList);
+		obj._loadTasks();
+	}
+
+	_onShowTodoClick(obj, event) {
+		obj._clearTasks(obj.$$taskList);
+		obj._loadTasks(false);
+	}
+
+	_clearTasks(container) {
+		while (container.firstChild) {
+    		container.removeChild(container.firstChild);
+		}
 	}
 }
 

@@ -10,10 +10,7 @@ class TaskService {
 	createNewTask(task) {
 		return fetch('/api/task/', {
 			method: 'POST',
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
-			},
+			headers: this._getHeaders(),
 			body: JSON.stringify(task)
 		}).then((response) => {
 			if (response.ok) {
@@ -25,10 +22,7 @@ class TaskService {
 	saveTask(task) {
 		return fetch('/api/task/' + task._id, {
 			method: 'PUT',
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
-			},
+			headers: this._getHeaders(),
 			body: JSON.stringify(task)
 		});
 	}
@@ -36,10 +30,22 @@ class TaskService {
 	deleteTask(id) {
 		return fetch('/api/task/' + id, {
 			method: 'DELETE',
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
-			}
+			headers: this._getHeaders()
 		});
+	}
+
+	changeState(id, state) {
+		return fetch('/api/task/' + id + '/changeState', {
+			method: 'PUT',
+			headers: this._getHeaders(),
+			body: JSON.stringify({ state: state })
+		});
+	}
+
+	_getHeaders() {
+		return {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		};
 	}
 }

@@ -21,6 +21,9 @@ class TaskService {
 	addTask(task){
 		return taskRepository.add(task);
 	}
+	changeState(id, state) {
+		return taskRepository.changeState(id, state);
+	}
 }
 
 module.exports = new TaskService();
