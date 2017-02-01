@@ -1,7 +1,13 @@
 const taskRepository = require('./taskRepository');
 const FormatError = require('../../common/FormatError');
+const SocketService = require('../../common/SocketService');
+
+const TASK_UPDATED_EVENT = 'task_updated';
 
 class TaskService {
+	constructor() {
+		this.socketService = new SocketService('http://localhost', 2222);
+	}
 
 	getAllTasks(){
 		return taskRepository.findAll();
@@ -12,18 +18,36 @@ class TaskService {
 	}
 
 	editTask(id, task){
-		return this._validateTask(task).then((task) => taskRepository.update({_id: id}, task));
+		return this._validateTask(task)
+			.then((task) => taskRepository.update({_id: id}, task))
+			.then((response) => {
+				this.socketService.send(TASK_UPDATED_EVENT);
+				return response;
+			});
 	}
 
 	deleteTask(id){
-		return taskRepository.delete({_id: id});
+		return taskRepository.delete({_id: id})
+			.then((response) => {
+				this.socketService.send(TASK_UPDATED_EVENT);
+				return response;
+			});
 	}
 
 	addTask(task){
-		return this._validateTask(task).then((task) => taskRepository.add(task));
+		return this._validateTask(task)
+			.then((task) => taskRepository.add(task))
+			.then((response) => {
+				this.socketService.send(TASK_UPDATED_EVENT);
+				return response;
+			});
 	}
 	changeState(id, state) {
-		return taskRepository.changeState(id, state);
+		return taskRepository.changeState(id, state)
+			.then((response) => {
+				this.socketService.send(TASK_UPDATED_EVENT);
+				return response;
+			});
 	}
 
 	_validateTask(task) {

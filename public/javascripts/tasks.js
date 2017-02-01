@@ -119,7 +119,6 @@ class TaskManager {
 			obj.$$taskList.appendChild(obj._renderTask(task));
 			$taskName.value = '';
 			$taskDescription.value = '';
-			obj.socket.emit('task_updated');
 		}).catch((err) => {
 			$taskName.value = '';
 			$taskDescription.value = '';
@@ -158,7 +157,6 @@ class TaskManager {
 
 			obj.domManipulator.toggleElements($block, $editableBlock);
 			obj.domManipulator.toggleElements($row.querySelector('.edit-task'), event.target);
-			obj.socket.emit('task_updated');
 		}).catch((err) => {
 			$editableTaskName.value = $taskNameReadonly.innerText;
 			$editableTaskDescription.value = $taskDescriptionReadonly.innerText;
@@ -172,7 +170,6 @@ class TaskManager {
 		var taskIdReadonly = $row.querySelector('.task-id');
 		obj.taskService.deleteTask(taskIdReadonly.innerText).then(function() {
 			obj.$$taskList.removeChild($row);
-			obj.socket.emit('task_updated');
 		});
 	}
 
@@ -181,7 +178,6 @@ class TaskManager {
 		var taskIdReadonly = $row.querySelector('.task-id');
 		var state = $row.querySelector('.task-is-done').checked;
 		obj.taskService.changeState(taskIdReadonly.innerText, state).then(function() {
-			obj.socket.emit('task_updated');
 		});
 	}
 
