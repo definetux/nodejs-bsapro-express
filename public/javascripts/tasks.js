@@ -120,6 +120,11 @@ class TaskManager {
 			$taskName.value = '';
 			$taskDescription.value = '';
 			obj.socket.emit('task_updated');
+		}).catch((err) => {
+			$taskName.value = '';
+			$taskDescription.value = '';
+
+			alert(err);
 		});
 	}
 
@@ -134,27 +139,31 @@ class TaskManager {
 		var isDone = $row.querySelector('.task-is-done').checked;
 
 		var $editableBlock = $row.querySelector('.editable');
-		var taskName = $editableBlock.querySelector('.task-name').value;
-		var taskDescription = $editableBlock.querySelector('.task-description').value;
+		var $editableTaskName = $editableBlock.querySelector('.task-name');
+		var $editableTaskDescription = $editableBlock.querySelector('.task-description');
 
 		var $block = $row.querySelector('.readonly');
 		var $taskIdReadonly = $block.querySelector('.task-id');
 		var $taskNameReadonly = $block.querySelector('.task-name');
 		var $taskDescriptionReadonly = $block.querySelector('.task-description');
 
-		$taskNameReadonly.innerText = taskName;
-		$taskDescriptionReadonly.innerText = taskDescription;
-
-		obj.domManipulator.toggleElements($block, $editableBlock);
-		obj.domManipulator.toggleElements($row.querySelector('.edit-task'), event.target);
-
 		obj.taskService.saveTask({
 			_id: $taskIdReadonly.innerText,
-			name: taskName,
-			description: taskDescription,
+			name: $editableTaskName.value,
+			description: $editableTaskDescription.value,
 			isDone: isDone
 		}).then(() => {
+			$taskNameReadonly.innerText = $editableTaskName.value;
+			$taskDescriptionReadonly.innerText = $editableTaskDescription.value;
+
+			obj.domManipulator.toggleElements($block, $editableBlock);
+			obj.domManipulator.toggleElements($row.querySelector('.edit-task'), event.target);
 			obj.socket.emit('task_updated');
+		}).catch((err) => {
+			$editableTaskName.value = $taskNameReadonly.innerText;
+			$editableTaskDescription.value = $taskDescriptionReadonly.innerText;
+
+			alert(err);
 		});
 	}
 

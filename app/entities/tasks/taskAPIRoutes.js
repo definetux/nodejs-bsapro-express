@@ -1,5 +1,6 @@
 const express = require('express');
 const taskRouter = express.Router();
+const FormatError = require('../../common/FormatError');
 
 const taskService = require('./taskService');
 
@@ -14,7 +15,13 @@ taskRouter.post('/', (req, res, next) => {
 	taskService
 		.addTask(req.body)
 		.then((task) => res.status(201).send(task))
-		.catch((err) => res.status(400).end());
+		.catch((err) => {
+			if (err instanceof FormatError) {
+				res.status(400).end();
+			} else {
+				res.status(500).end()
+			}
+		});
 });
 
 taskRouter.get('/:id', (req, res, next) => {
@@ -28,7 +35,13 @@ taskRouter.put('/:id', (req, res, next) => {
 	taskService
 		.editTask(req.params.id, req.body)
 		.then(() => res.end())
-		.catch((err) => res.status(400).end());
+		.catch((err) => {
+			if (err instanceof FormatError) {
+				res.status(400).end();
+			} else {
+				res.status(500).end()
+			}
+		});
 });
 
 taskRouter.put('/:id/changeState', (req, res, next) => {

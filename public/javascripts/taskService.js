@@ -15,6 +15,8 @@ class TaskService {
 		}).then((response) => {
 			if (response.ok) {
 				return response.json();
+			} else {
+				throw 'Data was not saved.';
 			}
 		});
 	}
@@ -24,6 +26,10 @@ class TaskService {
 			method: 'PUT',
 			headers: this._getHeaders(),
 			body: JSON.stringify(task)
+		}).then((response) => {
+			if (!response.ok) {
+				throw 'Data was not saved.';
+			}
 		});
 	}
 
