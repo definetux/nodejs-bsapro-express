@@ -1,50 +1,34 @@
-const express = require('express');
+const Koa = require('koa');
+const app = new Koa();
+const route = require('koa-route');
+const views = require('koa-views');
+const serve = require('koa-static');
 const path = require('path');
-const favicon = require('serve-favicon');
-const logger = require('morgan');
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
+const taskService = require('./entities/tasks/taskService');
 
-const app = express();
 
-const initializeViewRoutes = require('./routes/viewRoutes');
-const initializeAPIRoutes = require('./routes/apiRoutes');
+// app.use(route.get('/', list));
+// app.use(serve(path.join(__dirname, 'public')));
 
-var initializeDB = require('./db/db');
-initializeDB();
+app.use(views(__dirname + '/../../views', {
+  extension: 'pug'
+}));
 
-// view engine setup
-app.set('views', path.join(__dirname, '../views'));
-app.set('view engine', 'pug');
+app.use(route.get('/', home));
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, '/../node_modules')));
-app.use(express.static(path.join(__dirname, '/../public')));
 
-initializeViewRoutes(app);
-initializeAPIRoutes(app);
+function *home(ctx, next) {
+  console.log('render');
+  this.body = ctx.render('index');
+};
 
-// catch 404 and forward to error handler
-app.use((req, res, next) => {
-	const err = new Error('Not Found');
-	err.status = 404;
-	next(err);
+function *list() {
+	this.body = yield taskService.getAllTasks();
+}
+
+app.on('error', function(err, ctx){
+  log.error('server error', err);
+  ctx.res.status = err.status;
 });
 
-// error handler
-app.use((err, req, res, next) => {
-	// set locals, only providing error in development
-	res.locals.message = err.message;
-	res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-	// render the error page
-	res.status(err.status || 500);
-	res.render('error');
-});
-
-module.exports = app;
+app.listen(2222);
