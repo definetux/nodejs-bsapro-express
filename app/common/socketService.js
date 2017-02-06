@@ -1,12 +1,22 @@
-const io = require('socket.io-client');
+const io = require('socket.io');
+
+const CONNECTION_EVENT = 'connection';
+const TASK_UPDATED_EVENT = 'task_updated';
 
 class SocketService {
-	constructor(url, port) {
-		this.socket = io.connect(url + ':' + port);
-		this.socket.on('connect', () => console.log('server connected'));
+	connect(server) {
+		this.test = "asd";
+		const resolved = io(server);
+		resolved.on(CONNECTION_EVENT, (socket) => {
+			this.socket = socket;
+			socket.on(TASK_UPDATED_EVENT, (msg) => {
+				socket.broadcast.emit(TASK_UPDATED_EVENT);
+			});
+		});
 	}
 
 	send(evt) {
+		console.log(this);
 		this.socket.emit(evt);
 	}
 
@@ -15,4 +25,4 @@ class SocketService {
 	}
 }
 
-module.exports = SocketService;
+module.exports = new SocketService();

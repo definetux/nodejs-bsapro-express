@@ -37,6 +37,10 @@ class TaskService {
 		return fetch('/api/task/' + id, {
 			method: 'DELETE',
 			headers: this._getHeaders()
+		}).then((response) => {
+			if (!response.ok) {
+				throw 'Data was not removed';
+			}
 		});
 	}
 

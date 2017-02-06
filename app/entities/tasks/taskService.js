@@ -6,7 +6,7 @@ const TASK_UPDATED_EVENT = 'task_updated';
 
 class TaskService {
 	constructor() {
-		this.socketService = new SocketService('http://localhost', 2222);
+		this.socketService = SocketService;
 	}
 
 	getAllTasks(){

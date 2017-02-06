@@ -1,61 +1,72 @@
-const express = require('express');
-const taskRouter = express.Router();
+const task = require('koa-router')();
 const FormatError = require('../../common/FormatError');
 
 const taskService = require('./taskService');
 
-taskRouter.get('/', (req, res, next) => {
-	taskService
-		.getAllTasks()
-		.then((tasks) => res.send(tasks))
-		.catch((err) => res.status(400).end());
+task.get('/', async (ctx, next) => {
+	try {
+		const tasks = await taskService.getAllTasks();
+		ctx.body = tasks;
+	} catch (err) {
+		console.log(err);
+		ctx.status = 400;
+	}
 });
 
-taskRouter.post('/', (req, res, next) => {
-	taskService
-		.addTask(req.body)
-		.then((task) => res.status(201).send(task))
-		.catch((err) => {
-			if (err instanceof FormatError) {
-				res.status(400).end();
-			} else {
-				res.status(500).end()
-			}
-		});
+task.post('/', async (ctx, next) => {
+	try {
+		const task = await taskService.addTask(ctx.request.body);
+		ctx.status = 201;
+		ctx.body = task;
+	} catch (err) {
+		console.log(err);
+		if (err instanceof FormatError) {
+			ctx.status = 400;
+		} else {
+			ctx.status = 500;
+		}
+	}
 });
 
-taskRouter.get('/:id', (req, res, next) => {
-	taskService
-		.getTaskById(req.params.id)
-		.then((task) => res.send(task))
-		.catch((err) => res.status(400).end());
+task.get('/:id', async (ctx, next) => {
+	try {
+		const task = await taskService.getTaskById(ctx.params.id);
+		ctx.body = task;
+	} catch (err) {
+		console.log(err);
+		ctx.status = 400;
+	}
 });
 
-taskRouter.put('/:id', (req, res, next) => {
-	taskService
-		.editTask(req.params.id, req.body)
-		.then(() => res.end())
-		.catch((err) => {
-			if (err instanceof FormatError) {
-				res.status(400).end();
-			} else {
-				res.status(500).end()
-			}
-		});
+task.put('/:id', async (ctx, next) => {
+	try {
+		await taskService.editTask(ctx.params.id, ctx.request.body);
+	} catch (err) {
+		console.log(err);
+		if (err instanceof FormatError) {
+			ctx.status = 400;
+		} else {
+			ctx.status = 500;
+		}
+	}
 });
 
-taskRouter.put('/:id/changeState', (req, res, next) => {
-	taskService
-		.changeState(req.params.id, req.body.state)
-		.then(() => res.end())
-		.catch((err) => res.status(400).end());
+task.put('/:id/changeState', async (ctx, next) => {
+	try {
+		await taskService.changeState(ctx.params.id, ctx.request.body.state);
+	} catch(err) {
+		ctx.status = 400;
+	}
 });
 
-taskRouter.delete('/:id', (req, res, next) => {
-	taskService
-		.deleteTask(req.params.id)
-		.then(() => res.status(200).end())
-		.catch((err) => res.status(400).end());
+task.delete('/:id', async (ctx, next) => {
+	try {
+		await taskService.deleteTask(ctx.params.id);
+		ctx.status = 200;
+	} catch (err) {
+		console.log(err);
+		ctx.status = 400;
+	}
 });
 
-module.exports = taskRouter;
+module.exports = task;

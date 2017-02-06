@@ -1,34 +1,34 @@
 const Koa = require('koa');
 const app = new Koa();
-const route = require('koa-route');
-const views = require('koa-views');
-const serve = require('koa-static');
+
 const path = require('path');
+const logger = require('koa-logger');
+const views = require('koa-views');
+const convert = require('koa-convert');
+const bodyParser = require('koa-bodyparser');
+const static = require('koa-static');
+
 const taskService = require('./entities/tasks/taskService');
 
+const initializeViewRoutes = require('./routes/viewRoutes');
+const initializeAPIRoutes = require('./routes/apiRoutes');
 
-// app.use(route.get('/', list));
-// app.use(serve(path.join(__dirname, 'public')));
+const initializeDB = require('./db/db');
+initializeDB();
 
-app.use(views(__dirname + '/../../views', {
+app.use(views(__dirname + '/../views', {
   extension: 'pug'
 }));
 
-app.use(route.get('/', home));
+app.use(bodyParser());
+app.use(convert(logger()));
+app.use(static(path.join(__dirname, '/../public')));
+app.use(static(path.join(__dirname, '/../node_modules')));
 
+const viewRoutes = initializeViewRoutes();
+app.use(viewRoutes.routes(), viewRoutes.allowedMethods());
 
-function *home(ctx, next) {
-  console.log('render');
-  this.body = ctx.render('index');
-};
+const apiRoutes = initializeAPIRoutes();
+app.use(apiRoutes.routes(), apiRoutes.allowedMethods());
 
-function *list() {
-	this.body = yield taskService.getAllTasks();
-}
-
-app.on('error', function(err, ctx){
-  log.error('server error', err);
-  ctx.res.status = err.status;
-});
-
-app.listen(2222);
+module.exports = app;

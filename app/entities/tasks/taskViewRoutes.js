@@ -1,19 +1,8 @@
-const express = require('express');
-const task = express.Router();
+const task = require('koa-router')();
 
-const taskService = require('./taskService');
-
-task.get('/', (req, res, next) => {
+task.get('', async (ctx, next) => {
 	console.log('asd');
-	res.render('tasks');
-});
-
-task.get('/:id', (req, res, next) => {
-	taskService.getTaskById(req.params.id).then((task)=> {
-		res.render('task');
-	}).catch((err) => {
-		res.status(400).end();
-	});
+	await ctx.render('tasks');
 });
 
 module.exports = task;
