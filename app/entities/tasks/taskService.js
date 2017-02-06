@@ -6,7 +6,7 @@ const TASK_UPDATED_EVENT = 'task_updated';
 
 class TaskService {
 	constructor() {
-		this.socketService = SocketService;
+		this.socketService = SocketService
 	}
 
 	getAllTasks(){
@@ -17,37 +17,29 @@ class TaskService {
 		return taskRepository.findById(id);
 	}
 
-	editTask(id, task){
-		return this._validateTask(task)
-			.then((task) => taskRepository.update({_id: id}, task))
-			.then((response) => {
-				this.socketService.send(TASK_UPDATED_EVENT);
-				return response;
-			});
+	async editTask(id, task){
+		const t = await this._validateTask(task);
+		const response = await taskRepository.update({_id: id}, t);
+		this.socketService.send(TASK_UPDATED_EVENT);
+		return response;
 	}
 
-	deleteTask(id){
-		return taskRepository.delete({_id: id})
-			.then((response) => {
-				this.socketService.send(TASK_UPDATED_EVENT);
-				return response;
-			});
+	async deleteTask(id){
+		const response = await taskRepository.delete({_id: id});
+		this.socketService.send(TASK_UPDATED_EVENT);
+		return response;
 	}
 
-	addTask(task){
-		return this._validateTask(task)
-			.then((task) => taskRepository.add(task))
-			.then((response) => {
-				this.socketService.send(TASK_UPDATED_EVENT);
-				return response;
-			});
+	async addTask(task){
+		const t = await this._validateTask(task);
+		const response = await taskRepository.add(t);
+		this.socketService.send(TASK_UPDATED_EVENT);
+		return response;
 	}
-	changeState(id, state) {
-		return taskRepository.changeState(id, state)
-			.then((response) => {
-				this.socketService.send(TASK_UPDATED_EVENT);
-				return response;
-			});
+	async changeState(id, state) {
+		const response = await taskRepository.changeState(id, state);
+		this.socketService.send(TASK_UPDATED_EVENT);
+		return response;
 	}
 
 	_validateTask(task) {

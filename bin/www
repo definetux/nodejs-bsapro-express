@@ -20,7 +20,7 @@ const port = normalizePort(process.env.PORT || '2222');
  */
 
 const server = http.createServer(app.callback());
-const io = require('../app/common/socketService');
+const io = require('../app/common/SocketService');
 io.connect(server);
 
 /**

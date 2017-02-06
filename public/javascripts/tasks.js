@@ -116,7 +116,6 @@ class TaskManager {
 			name: $taskName.value,
 			description: $taskDescription.value
 		}).then((task) => {
-			obj.$$taskList.appendChild(obj._renderTask(task));
 			$taskName.value = '';
 			$taskDescription.value = '';
 		}).catch((err) => {
@@ -169,7 +168,6 @@ class TaskManager {
 		var $row = obj.domManipulator.getClosest(event.target, '.grid-row');
 		var taskIdReadonly = $row.querySelector('.task-id');
 		obj.taskService.deleteTask(taskIdReadonly.innerText).then(function() {
-			obj.$$taskList.removeChild($row);
 		});
 	}
 
