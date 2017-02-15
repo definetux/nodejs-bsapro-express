@@ -1,18 +1,27 @@
 extends layout
 
 block content
-	h1 Here are the tasks
-	.task-container
-		.show-history
-			button.show-all(type="button") All
-			button.show-todo(type="button") TODO
-		#new-task
-			input.task-name(type="text" placeholder="Name")
-			input.task-description(type="text" placeholder="Description")
-			button.add-task(type="button") Save
-		#task-list
+	#math
+		input.fib-num-input(type="text" placeholder="Fib number...")
+		button.get-fib(type="button") Get Fib
+		span.fib-num-output
+		.log-container
+			.title Log
+			.log
+	.tasks
+		h1 Here are the tasks
+		.task-container
+			.show-history
+				button.show-all(type="button") All
+				button.show-todo(type="button") TODO
+			#new-task
+				input.task-name(type="text" placeholder="Name")
+				input.task-description(type="text" placeholder="Description")
+				button.add-task(type="button") Save
+			#task-list
 
 	script(src="/socket.io-client/dist/socket.io.js")
 	script(src="/javascripts/taskService.js")
+	script(src="/javascripts/mathService.js")
 	script(src="/javascripts/DOMManipulator.js")
 	script(src="/javascripts/tasks.js")

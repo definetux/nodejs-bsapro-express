@@ -42,3 +42,17 @@ a {
 .task-container .grid-row {
 	margin-bottom: 10px;
 }
+#math {
+	position: relative;
+}
+#math .fib-num-input {
+	margin-right: 20px;
+}
+#math .fib-num-output {
+	margin-left: 20px;
+}
+#math .log-container {
+	position: absolute;
+	top: 0;
+	left: 50%;
+}

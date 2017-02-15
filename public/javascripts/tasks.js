@@ -2,6 +2,7 @@ class TaskManager {
 	constructor() {
 		this.$$taskList = document.getElementById('task-list');
 		this.taskService = new TaskService();
+		this.mathService = new MathService();
 		this.domManipulator = new DOMManipulator();
 		this.commands = [];
 
@@ -37,6 +38,10 @@ class TaskManager {
 			commandName: 'show-all',
 			callback: this._onShowAllClick
 		});
+		this.commands.push({
+			commandName: 'get-fib',
+			callback: this._onGetFib
+		});
 
 		document.addEventListener('click', (event) => {
 			this.commands.forEach((c) => {
@@ -53,9 +58,22 @@ class TaskManager {
 		this._loadTasks();
 		this.socket = io('http://localhost:2222');
 		this.socket.on('task_updated', (data) => {
-			this._clearTasks(this.$$taskList);
+			this._clearContainer(this.$$taskList);
 			this._loadTasks(this.showAll);
 		});
+		this.socket.on('fib_updated', (data) => {
+			this._addLog(data);
+		});
+	}
+
+	_addLog(data) {
+		var $mathBlock = document.getElementById('math');
+		var $logContainer = $mathBlock.querySelector('.log');
+		var $newLogBlock = this.domManipulator.createBlock();
+		var $newLog = this.domManipulator.createText(data);
+		$newLogBlock.appendChild($newLog);
+		$logContainer.appendChild($newLogBlock);
+
 	}
 
 	_loadTasks(all = true) {
@@ -183,17 +201,27 @@ class TaskManager {
 
 	_onShowAllClick(obj, event) {
 		obj.showAll = true;
-		obj._clearTasks(obj.$$taskList);
+		obj._clearContainer(obj.$$taskList);
 		obj._loadTasks(obj.showAll);
 	}
 
 	_onShowTodoClick(obj, event) {
 		obj.showAll = false;
-		obj._clearTasks(obj.$$taskList);
+		obj._clearContainer(obj.$$taskList);
 		obj._loadTasks(obj.showAll);
 	}
 
-	_clearTasks(container) {
+	_onGetFib(obj, event) {
+		var $fibNumInput = event.target.parentNode.querySelector('.fib-num-input');
+		var $fibNumOutput = event.target.parentNode.querySelector('.fib-num-output');
+		var $logContainer = event.target.parentNode.querySelector('.log');
+
+		obj._clearContainer($logContainer);
+
+		obj.mathService.getFib($fibNumInput.value).then((data) => $fibNumOutput.innerText = data.result);
+	}
+
+	_clearContainer(container) {
 		while (container.firstChild) {
     		container.removeChild(container.firstChild);
 		}

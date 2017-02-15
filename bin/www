@@ -4,9 +4,13 @@
  * Module dependencies.
  */
 
+const cluster = require('cluster');
+const numCPUs = require('os').cpus().length;
+
 var app = require('../app/');
 var debug = require('debug')('express:server');
 var http = require('http');
+
 
 
 /**
@@ -16,26 +20,29 @@ var http = require('http');
 var port = normalizePort(process.env.PORT || '2222');
 app.set('port', port);
 
+// if (cluster.isMaster) {
+// 	console.log(`Master ${process.pid} is running`);
+
+// 	for(let i = 0; i < numCPUs; i++) {
+// 		cluster.fork();
+// 	}
+// } else {
+	var server = http.createServer(app);
+	const io = require('../app/common/SocketService');
+	io.connect(server);
+	console.log('connect io');
+	/**
+	 * Listen on provided port, on all network interfaces.
+	 */
+
+	server.listen(port);
+	server.on('error', onError);
+	server.on('listening', onListening);
+// }
+
 /**
  * Create HTTP server.
  */
-
-var server = http.createServer(app);
-const io = require('socket.io')(server);
-
-io.on('connect', (socket) => {
-	socket.on('task_updated', function(msg){
-		socket.broadcast.emit('task_updated');
-	});
-});
-
-/**
- * Listen on provided port, on all network interfaces.
- */
-
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
 
 /**
  * Normalize a port into a number, string, or false.
