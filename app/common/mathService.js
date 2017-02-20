@@ -16,7 +16,7 @@ class Math {
                         res(msg.data);
                         break;
                     case 'temp': 
-                        this.socketService.send("fib_updated", msg.data);
+                        this.socketService.broadcast(this.socketService.FIB_UPDATED_EVENT, msg.data);
                 };
             });
 

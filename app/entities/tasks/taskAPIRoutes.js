@@ -16,6 +16,7 @@ taskRouter.post('/', (req, res, next) => {
 		.addTask(req.body)
 		.then((task) => res.status(201).send(task))
 		.catch((err) => {
+			console.log(err);
 			if (err instanceof FormatError) {
 				res.status(400).end();
 			} else {

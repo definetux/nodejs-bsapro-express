@@ -57,11 +57,11 @@ class TaskManager {
 		this._bindListeners();
 		this._loadTasks();
 		this.socket = io('http://localhost:2222');
-		this.socket.on('task_updated', (data) => {
+		this.socket.on('TASK_UPDATED_EVENT', (data) => {
 			this._clearContainer(this.$$taskList);
 			this._loadTasks(this.showAll);
 		});
-		this.socket.on('fib_updated', (data) => {
+		this.socket.on('FIB_UPDATED_EVENT', (data) => {
 			this._addLog(data);
 		});
 	}
@@ -134,7 +134,7 @@ class TaskManager {
 			name: $taskName.value,
 			description: $taskDescription.value
 		}).then((task) => {
-			obj.$$taskList.appendChild(obj._renderTask(task));
+			// obj.$$taskList.appendChild(obj._renderTask(task));
 			$taskName.value = '';
 			$taskDescription.value = '';
 		}).catch((err) => {
@@ -187,7 +187,7 @@ class TaskManager {
 		var $row = obj.domManipulator.getClosest(event.target, '.grid-row');
 		var taskIdReadonly = $row.querySelector('.task-id');
 		obj.taskService.deleteTask(taskIdReadonly.innerText).then(function() {
-			obj.$$taskList.removeChild($row);
+			// obj.$$taskList.removeChild($row);
 		});
 	}
 

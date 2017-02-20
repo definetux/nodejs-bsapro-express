@@ -1,29 +1,25 @@
-const io = require('socket.io');
-
-const CONNECTION_EVENT = 'connection';
-const TASK_UPDATED_EVENT = 'task_updated';
-const FIB_UPDATED_EVENT = 'fib_updated';
+var io = require('socket.io')();
 
 class SocketService {
-	connect(server) {
-		const resolved = io(server);
-		resolved.on(CONNECTION_EVENT, (socket) => {
-			this.socket = socket;
-			socket.on(TASK_UPDATED_EVENT, (msg) => {
-				socket.broadcast.emit(TASK_UPDATED_EVENT);
-			});
-			socket.on(FIB_UPDATED_EVENT, (msg) => {
-				socket.broadcast.emit(FIB_UPDATED_EVENT, msg);
-			});
-		});
+	constructor() {
+		this.io = io;
+		this.TASK_UPDATED_EVENT = 'TASK_UPDATED_EVENT';
+		this.FIB_UPDATED_EVENT = 'FIB_UPDATED_EVENT';
 	}
 
-	send(evt, msg) {
-		this.socket.emit(evt, msg);
+	connect(server, adapter) {
+		if (adapter) {
+			this.io.adapter(adapter);
+		}
+		this.io.listen(server);
+		io.on('connection', (socket) => this.socket = socket);
 	}
 
-	subscribe(evt, callback) {
-		this.socket.on(evt, callback);
+	send(ev, msg) {
+		this.socket.broadcast.emit(ev, msg);
+	}
+	broadcast(ev, msg) {
+		this.io.emit(ev, msg);
 	}
 }
 
